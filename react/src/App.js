@@ -8,13 +8,34 @@ import Button from 'react-bootstrap/Button';
 import 'bootstrap/dist/css/bootstrap.css';
 import InputGroup from 'react-bootstrap/InputGroup';
 import Alert from 'react-bootstrap/Alert';
+import axios from 'axios';
 
 function App() {
   const [url, setUrl] = useState('');
+  const [result, setResult] = useState('');
 
-  function handleReset() {
+  const handleChange = event => {
+    setUrl(event.target.value);
+  };
+
+  const handleSubmit = event => {
+    event.preventDefault();
+    axios
+      .post('http://localhost:5000/', {
+        url: url
+      })
+      .then(response => {
+        setResult(response.data);
+      })
+      .catch(error => {
+        console.log(error);
+      });
+  };
+
+  const resetForm = () => {
     setUrl('');
-  }
+    setResult('');
+  };
 
   return (
     <Container>
@@ -29,18 +50,19 @@ function App() {
             id="basic-url"
             aria-describedby="basic-addon3"
             value={url}
-            onChange={e => setUrl(e.target.value)}
+            onChange={handleChange}
           />
         </InputGroup>
 
         <div className="box">
-          <Button variant="secondary" size="lg" onClick={handleReset}>
+          <Button variant="secondary" size="lg" onClick={resetForm}>
             Reset
           </Button>{' '}
-          <Button variant="success" size="lg">
+          <Button variant="success" size="lg" onClick={handleSubmit}>
             Submit
           </Button>{' '}
         </div>
+        {result && <Alert variant="info">{result}</Alert>}
       </div>
     </Container>
   );
